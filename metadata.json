@@ -1,0 +1,6 @@
+{
+  "name": "Peak Day",
+  "description": "An all-in-one personal operating system for students and fitness-focused individuals, engineered with a premium Apple-inspired dark interface.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

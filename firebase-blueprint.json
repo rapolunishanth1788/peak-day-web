@@ -1,0 +1,252 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile data stored by authentication UID",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Auth UID of user" },
+        "email": { "type": "string", "description": "Email address of user" },
+        "displayName": { "type": "string", "description": "Display name of user" },
+        "photoURL": { "type": "string", "description": "Avatar URL" },
+        "role": { "type": "string", "description": "User role: student-athlete", "enum": ["student-athlete", "coach", "admin"] },
+        "createdAt": { "type": "string", "description": "ISO timestamp string" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp string" }
+      },
+      "required": ["userId", "email"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "Peak Day task item associated with user",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Auth UID of the task owner" },
+        "title": { "type": "string", "description": "Task description", "maxLength": 300 },
+        "category": { "type": "string", "description": "Category of task", "enum": ["Academics", "Fitness", "College", "Personal", "Other"] },
+        "priority": { "type": "string", "description": "Priority rating", "enum": ["Low", "Medium", "High"] },
+        "dueDate": { "type": "string", "description": "Due date in YYYY-MM-DD" },
+        "completed": { "type": "boolean", "description": "Whether task is completed" },
+        "notes": { "type": "string", "description": "Optional notes", "maxLength": 2000 },
+        "createdAt": { "type": "string", "description": "ISO creation date string" },
+        "completedAt": { "type": "string", "description": "ISO completion date string" },
+        "updatedAt": { "type": "string", "description": "ISO update date string" }
+      },
+      "required": ["userId", "title", "category", "priority", "dueDate", "completed"]
+    },
+    "ScheduleEvent": {
+      "title": "ScheduleEvent",
+      "description": "Class, exam, assignment deadline, event, or reminder on timetable",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Auth UID of event owner" },
+        "title": { "type": "string", "description": "Event title", "maxLength": 200 },
+        "type": { "type": "string", "description": "Type of scheduled item", "enum": ["Class", "Exam", "Assignment", "Event", "Reminder"] },
+        "courseCode": { "type": "string", "description": "Associated course code if any", "maxLength": 50 },
+        "location": { "type": "string", "description": "Location or room e.g. Packard 101 or Gym", "maxLength": 150 },
+        "startTime": { "type": "string", "description": "Start time e.g. 11:30 or 11:30 AM" },
+        "endTime": { "type": "string", "description": "End time e.g. 12:45 or 12:45 PM" },
+        "date": { "type": "string", "description": "Event date in YYYY-MM-DD" },
+        "category": { "type": "string", "description": "Category of event", "enum": ["Academic", "Fitness", "Personal", "Other"] },
+        "daysOfWeek": { "type": "array", "items": { "type": "number" }, "description": "Days of week 0-6 for recurring items" },
+        "instructor": { "type": "string", "description": "Instructor or coach name", "maxLength": 100 },
+        "notes": { "type": "string", "description": "Notes for event", "maxLength": 1000 },
+        "color": { "type": "string", "description": "Color hex or tag for display" },
+        "completed": { "type": "boolean", "description": "Whether assignment/reminder is marked completed" },
+        "createdAt": { "type": "string", "description": "ISO creation timestamp" },
+        "updatedAt": { "type": "string", "description": "ISO update timestamp" }
+      },
+      "required": ["userId", "title", "type", "startTime", "endTime", "date"]
+    },
+    "Subject": {
+      "title": "Subject",
+      "description": "Academic course or subject enrolled by student",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Auth UID of student" },
+        "name": { "type": "string", "description": "Course title", "maxLength": 150 },
+        "code": { "type": "string", "description": "Course code e.g. CS 329D", "maxLength": 30 },
+        "instructor": { "type": "string", "description": "Instructor name", "maxLength": 100 },
+        "credits": { "type": "number", "description": "Academic credits" },
+        "targetGrade": { "type": "string", "description": "Target letter grade e.g. A" },
+        "currentGrade": { "type": "string", "description": "Current letter grade or percentage" },
+        "color": { "type": "string", "description": "Color theme tag for schedule" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["userId", "name", "code"]
+    },
+    "AcademicRecord": {
+      "title": "AcademicRecord",
+      "description": "GPA, semester metrics and historical records",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Auth UID of student" },
+        "term": { "type": "string", "description": "Semester/Quarter e.g. Fall 2026", "maxLength": 50 },
+        "gpa": { "type": "number", "description": "Term GPA" },
+        "cumulativeGpa": { "type": "number", "description": "Cumulative GPA" },
+        "creditsCompleted": { "type": "number", "description": "Credits completed" },
+        "targetGpa": { "type": "number", "description": "Target GPA" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["userId", "term", "gpa"]
+    },
+    "Workout": {
+      "title": "Workout",
+      "description": "Athletic workout or training session",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Auth UID of athlete" },
+        "title": { "type": "string", "description": "Workout name e.g. Upper Hypertrophy", "maxLength": 150 },
+        "category": { "type": "string", "description": "Workout type e.g. Strength, Conditioning, Recovery", "maxLength": 50 },
+        "scheduledTime": { "type": "string", "description": "Scheduled time e.g. 05:30 PM" },
+        "durationMinutes": { "type": "number", "description": "Session duration in minutes" },
+        "completed": { "type": "boolean", "description": "Completed status" },
+        "rpe": { "type": "number", "description": "Rate of perceived exertion (1-10)" },
+        "notes": { "type": "string", "description": "Workout log notes", "maxLength": 1000 },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["userId", "title", "completed"]
+    },
+    "WorkoutTemplate": {
+      "title": "WorkoutTemplate",
+      "description": "Pre-built or user-created workout routines and training plans",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Auth UID of athlete or template creator" },
+        "name": { "type": "string", "description": "Template routine name", "maxLength": 150 },
+        "category": { "type": "string", "description": "Training split or category", "maxLength": 50 },
+        "targetMuscleGroups": { "type": "string", "description": "Target primary muscle groups", "maxLength": 200 },
+        "notes": { "type": "string", "description": "Routine tips or description", "maxLength": 1000 },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["userId", "name"]
+    },
+    "FitnessProgress": {
+      "title": "FitnessProgress",
+      "description": "Biometrics, recovery, and readiness metrics",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Auth UID of athlete" },
+        "date": { "type": "string", "description": "Date in YYYY-MM-DD" },
+        "weight": { "type": "number", "description": "Body weight in lbs or kg" },
+        "sleepHours": { "type": "number", "description": "Hours of sleep" },
+        "restingHeartRate": { "type": "number", "description": "Resting heart rate in bpm" },
+        "sorenessScore": { "type": "number", "description": "Soreness rating 1-10" },
+        "energyScore": { "type": "number", "description": "Energy readiness rating 1-10" },
+        "notes": { "type": "string", "description": "Daily physical check-in notes", "maxLength": 500 },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["userId", "date"]
+    },
+    "Goal": {
+      "title": "Goal",
+      "description": "Academic, fitness, or personal goal",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Auth UID of user" },
+        "title": { "type": "string", "description": "Goal title", "maxLength": 200 },
+        "category": { "type": "string", "description": "Category of goal", "enum": ["Academics", "Fitness", "Personal", "Other"] },
+        "targetValue": { "type": "number", "description": "Target metric quantity" },
+        "currentValue": { "type": "number", "description": "Current metric quantity" },
+        "unit": { "type": "string", "description": "Unit e.g. lbs, hours, GPA, reps", "maxLength": 30 },
+        "deadline": { "type": "string", "description": "Target completion date YYYY-MM-DD" },
+        "completed": { "type": "boolean", "description": "Goal completed status" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["userId", "title", "category", "completed"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "User in-app notifications and alerts",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Auth UID of user" },
+        "title": { "type": "string", "description": "Notification title", "maxLength": 150 },
+        "message": { "type": "string", "description": "Notification body message", "maxLength": 500 },
+        "type": { "type": "string", "description": "Type of alert", "enum": ["task", "schedule", "academic", "fitness", "system"] },
+        "read": { "type": "boolean", "description": "Read status" },
+        "actionUrl": { "type": "string", "description": "Target section or link", "maxLength": 100 },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["userId", "title", "message", "read"]
+    },
+    "AiConversation": {
+      "title": "AiConversation",
+      "description": "Chat message with AI Assistant",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Auth UID of user" },
+        "role": { "type": "string", "description": "Sender role", "enum": ["user", "assistant", "system"] },
+        "content": { "type": "string", "description": "Message text", "maxLength": 4000 },
+        "contextType": { "type": "string", "description": "Context topic", "enum": ["general", "academic", "fitness", "schedule", "task"] },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["userId", "role", "content"]
+    },
+    "UserPreference": {
+      "title": "UserPreference",
+      "description": "User configuration, theme, and notification preferences",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Auth UID of user" },
+        "theme": { "type": "string", "description": "Interface theme", "enum": ["dark", "midnight", "oled"] },
+        "notificationsEnabled": { "type": "boolean", "description": "Enable in-app notifications" },
+        "emailDigest": { "type": "boolean", "description": "Enable daily email summary" },
+        "dailyReminderTime": { "type": "string", "description": "Daily briefing reminder time e.g. 08:00 AM" },
+        "defaultView": { "type": "string", "description": "Initial view on login", "enum": ["dashboard", "tasks", "schedule"] },
+        "createdAt": { "type": "string", "description": "ISO timestamp" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["userId"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profile documents stored by user UID"
+    },
+    "/tasks/{taskId}": {
+      "schema": { "$ref": "#/entities/Task" },
+      "description": "Task items owned by user with userId field"
+    },
+    "/schedule/{eventId}": {
+      "schema": { "$ref": "#/entities/ScheduleEvent" },
+      "description": "Calendar and schedule events owned by user"
+    },
+    "/subjects/{subjectId}": {
+      "schema": { "$ref": "#/entities/Subject" },
+      "description": "Academic course subjects enrolled by user"
+    },
+    "/academicRecords/{recordId}": {
+      "schema": { "$ref": "#/entities/AcademicRecord" },
+      "description": "GPA and semester progress metrics"
+    },
+    "/workouts/{workoutId}": {
+      "schema": { "$ref": "#/entities/Workout" },
+      "description": "Workouts and training logs for athlete"
+    },
+    "/workoutTemplates/{templateId}": {
+      "schema": { "$ref": "#/entities/WorkoutTemplate" },
+      "description": "Custom and pre-built workout templates and routines"
+    },
+    "/fitnessProgress/{progressId}": {
+      "schema": { "$ref": "#/entities/FitnessProgress" },
+      "description": "Biometric and readiness logs"
+    },
+    "/goals/{goalId}": {
+      "schema": { "$ref": "#/entities/Goal" },
+      "description": "Student-athlete goals and milestones"
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "In-app alerts and notifications"
+    },
+    "/aiConversations/{messageId}": {
+      "schema": { "$ref": "#/entities/AiConversation" },
+      "description": "AI Coach chat history records"
+    },
+    "/userPreferences/{userId}": {
+      "schema": { "$ref": "#/entities/UserPreference" },
+      "description": "User preference settings stored by user UID"
+    }
+  }
+}

@@ -1,0 +1,124 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default-deny catch-all to ensure zero-trust security
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // 1. User Profiles Collection (keyed by Auth UID)
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isOwner(userId) && isValidId(userId) && request.resource.data.userId == request.auth.uid;
+      allow delete: if false; // User accounts are preserved or managed via Auth
+
+      // Any nested subcollections under a user profile
+      match /{allSubcollections=**} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // 2. User Preferences Collection (keyed by Auth UID)
+    match /userPreferences/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isOwner(userId) && isValidId(userId) && request.resource.data.userId == request.auth.uid;
+      allow delete: if isOwner(userId) && isValidId(userId);
+    }
+
+    // 3. Tasks Collection (scoped to userId)
+    match /tasks/{taskId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(taskId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(taskId) && resource.data.userId == request.auth.uid && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && isValidId(taskId) && resource.data.userId == request.auth.uid;
+    }
+
+    // 4. Schedule Events Collection (classes, practices, meetings)
+    match /schedule/{eventId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(eventId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(eventId) && resource.data.userId == request.auth.uid && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && isValidId(eventId) && resource.data.userId == request.auth.uid;
+    }
+
+    // 5. Academic Subjects / Courses
+    match /subjects/{subjectId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(subjectId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(subjectId) && resource.data.userId == request.auth.uid && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && isValidId(subjectId) && resource.data.userId == request.auth.uid;
+    }
+
+    // 6. Academic Records & GPA history
+    match /academicRecords/{recordId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(recordId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(recordId) && resource.data.userId == request.auth.uid && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && isValidId(recordId) && resource.data.userId == request.auth.uid;
+    }
+
+    // 7. Workouts & Athletic Training Sessions
+    match /workouts/{workoutId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(workoutId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(workoutId) && resource.data.userId == request.auth.uid && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && isValidId(workoutId) && resource.data.userId == request.auth.uid;
+    }
+
+    // 7b. Workout Templates & Routines
+    match /workoutTemplates/{templateId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(templateId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(templateId) && resource.data.userId == request.auth.uid && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && isValidId(templateId) && resource.data.userId == request.auth.uid;
+    }
+
+    // 8. Fitness Progress & Biometrics
+    match /fitnessProgress/{progressId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(progressId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(progressId) && resource.data.userId == request.auth.uid && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && isValidId(progressId) && resource.data.userId == request.auth.uid;
+    }
+
+    // 9. Goals & Milestones
+    match /goals/{goalId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(goalId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(goalId) && resource.data.userId == request.auth.uid && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && isValidId(goalId) && resource.data.userId == request.auth.uid;
+    }
+
+    // 10. Notifications
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(notificationId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(notificationId) && resource.data.userId == request.auth.uid && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && isValidId(notificationId) && resource.data.userId == request.auth.uid;
+    }
+
+    // 11. AI Assistant Conversations
+    match /aiConversations/{conversationId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(conversationId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(conversationId) && resource.data.userId == request.auth.uid && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && isValidId(conversationId) && resource.data.userId == request.auth.uid;
+    }
+  }
+}
